@@ -6,6 +6,7 @@ import java.util.List;
 import com.book.common.core.domain.entity.SysDept;
 import com.book.common.core.domain.entity.SysUser;
 import com.book.common.utils.DateUtils;
+import com.book.common.utils.StringUtils;
 import com.book.system.service.ISysDeptService;
 import com.book.system.service.ISysUserService;
 import com.book.work.domain.vo.TeachClassVO;
@@ -49,7 +50,7 @@ public class TeachClassServiceImpl extends ServiceImpl<TeachClassMapper, TeachCl
         BeanUtils.copyProperties(teachClass, teachClassVO);
         SysUser sysUser = userService.selectUserById(teachClass.getUserId());
         teachClassVO.setSysUser(sysUser);
-        teachClassVO.setUserName(sysUser.getUserName());
+        teachClassVO.setUserName(StringUtils.isEmpty(sysUser.getNickName()) ? sysUser.getUserName() : sysUser.getNickName());
 
         SysDept sysDept = deptService.selectDeptById(teachClass.getDeptId());
         teachClassVO.setDeptName(sysDept.getDeptName());
@@ -72,7 +73,7 @@ public class TeachClassServiceImpl extends ServiceImpl<TeachClassMapper, TeachCl
             BeanUtils.copyProperties(clazz, teachClassVO);
             SysUser sysUser = userService.selectUserById(clazz.getUserId());
             teachClassVO.setSysUser(sysUser);
-            teachClassVO.setUserName(sysUser.getUserName());
+            teachClassVO.setUserName(StringUtils.isEmpty(sysUser.getNickName()) ? sysUser.getUserName() : sysUser.getNickName());
 
             SysDept sysDept = deptService.selectDeptById(clazz.getDeptId());
             teachClassVO.setDeptName(sysDept.getDeptName());

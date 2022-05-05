@@ -138,8 +138,15 @@
         <el-form-item label="专业名" prop="deptId">
           <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true" placeholder="请选择专业"/>
         </el-form-item>
-        <el-form-item label="班级负责人ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入班级负责ID"/>
+        <el-form-item label="班级负责人" prop="userId" label-width="100px">
+          <el-select v-model="form.userId" placeholder="请选择班级负责">
+            <el-option
+              v-for="item in stuList"
+              :key="item.userId"
+              :label="item.nickName"
+              :value="item.userId"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
@@ -165,6 +172,7 @@ import {
 import { treeselect } from '@/api/system/dept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+
 export default {
   name: 'Teachclass',
   dicts: ['sys_common_status'],
@@ -185,6 +193,8 @@ export default {
       total: 0,
       // 班级列表表格数据
       teachclassList: [],
+      // 班级学生用户
+      stuList: [],
       // 部门树选项
       deptOptions: undefined,
       // 弹出层标题
@@ -221,7 +231,7 @@ export default {
   },
   created() {
     this.getList()
-    this.getTreeselect()
+    this.getTreeselect(this.$store.state.user.classId)
   },
   methods: {
     /** 查询班级列表列表 */
@@ -272,17 +282,19 @@ export default {
     getTreeselect(classId) {
       treeselect().then(response => {
         this.deptOptions = response.data
-      });
+      })
       if (null != classId) {
         listTeachClassStuList(classId).then(response => {
+          this.stuList = response
+          this.form.stuList = this.stuList
           console.log(response)
-        });
+        })
       }
     },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset()
-      this.getTreeselect()
+      this.getTreeselect(this.$store.state.user.classId)
       this.open = true
       this.title = '添加班级列表'
     },

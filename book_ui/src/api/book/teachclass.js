@@ -12,7 +12,7 @@ export function listTeachclass(query) {
 // 查询班级学生列表
 export function listTeachClassStuList(classId) {
   return request({
-    url: '/book/teachclass/stulist/' + classId,
+    url: '/book/teachclass/stuList/' + classId,
     method: 'get'
   })
 }

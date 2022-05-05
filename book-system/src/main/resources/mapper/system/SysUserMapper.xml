@@ -99,6 +99,9 @@
         <if test="status != null and status != ''">
             AND u.status = #{status}
         </if>
+        <if test="classId != null and classId != ''">
+            AND u.class_id = #{classId}
+        </if>
         <if test="phonenumber != null and phonenumber != ''">
             AND u.phonenumber like concat('%', #{phonenumber}, '%')
         </if>
