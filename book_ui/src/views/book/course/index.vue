@@ -41,16 +41,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="书籍列表" prop="books">
-        <el-select v-model="queryParams.books" placeholder="请选择书籍列表" clearable>
-          <el-option
-            v-for="dict in dict.type.tb_book_status"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -114,11 +104,7 @@
       <el-table-column label="课时" align="center" prop="hour"/>
       <el-table-column label="学期" align="center" prop="semester"/>
       <el-table-column label="学年" align="center" prop="year"/>
-      <el-table-column label="书籍列表" align="center" prop="books">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.tb_book_status" :value="scope.row.books"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="书籍列表" align="center" prop="books" />
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -166,13 +152,15 @@
           <el-input v-model="form.year" placeholder="请输入学年"/>
         </el-form-item>
         <el-form-item label="书籍列表" prop="books">
-
-          <el-select v-model="form.books" multiple placeholder="请选择书籍列表">
+          <el-select v-model="form.bookIds" multiple remote filterable size="medium"
+                     default-first-option multiple placeholder="请选择书籍列表"
+          >
             <el-option
               v-for="item in bookList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
+              :disabled="item.status === 1"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -213,6 +201,8 @@ export default {
       courseList: [],
       // 书籍列表
       bookList: [],
+      // 书籍列表
+      bookIds: [],
       // 弹出层标题
       title: '',
       // 是否显示弹出层
@@ -300,7 +290,9 @@ export default {
       const id = row.id || this.ids
       getCourse(id).then(response => {
         this.form = response.data
-        this.bookList = response.bookList
+        this.bookList = this.form.bookList
+        this.bookIds = this.form.bookIds
+        console.log(this.bookIds)
         this.open = true
         this.title = '修改课程列'
       })
@@ -308,8 +300,12 @@ export default {
     /** 提交按钮 */
     submitForm() {
       this.$refs['form'].validate(valid => {
+        console.log(this.form.bookIds)
         if (valid) {
           if (this.form.id != null) {
+            console.log(this.bookIds)
+            this.form.books = this.form.bookIds.join(',')
+            console.log(this.form.books)
             updateCourse(this.form).then(response => {
               this.$modal.msgSuccess('修改成功')
               this.open = false

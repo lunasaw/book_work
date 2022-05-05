@@ -9,6 +9,8 @@ import com.book.common.utils.DateUtils;
 import com.book.work.domain.Book;
 import com.book.work.domain.CourseVO;
 import com.book.work.mapper.BookMapper;
+import net.sf.jsqlparser.statement.select.Join;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -37,9 +39,10 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public CourseVO selectCourseById(Long id) {
         Course course = courseMapper.selectCourseById(id);
-        List<Long> bookIds = Arrays.stream(course.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
-        List<Book> books = bookService.selectListByIds(bookIds);
-        CourseVO convert = CourseVO.convert(course, books);
+        List<Book> bookList = Lists.newArrayList();
+        CourseVO convert = CourseVO.convert(course, bookList);
+        bookList = bookService.selectBookList(new Book());
+        convert.setBookList(bookList);
         return convert;
     }
 
@@ -60,6 +63,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             List<Book> books = bookService.selectListByIds(bookIds);
             return CourseVO.convert(e, books);
         }).collect(Collectors.toList());
+
         return collect;
     }
 

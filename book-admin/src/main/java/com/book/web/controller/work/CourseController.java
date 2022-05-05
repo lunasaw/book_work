@@ -58,7 +58,11 @@ public class CourseController extends BaseController {
     public TableDataInfo list(Course course) {
         startPage();
         List<CourseVO> list = courseService.selectCourseList(course);
-
+        for (CourseVO courseVO : list) {
+            List<Book> books = courseVO.getBookList();
+            List<String> bookNames = books.stream().map(Book::getName).collect(Collectors.toList());
+            courseVO.setBooks(Join.join(",", bookNames));
+        }
         return getDataTable(list);
     }
 
