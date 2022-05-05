@@ -1,34 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.book.work.mapper.TeachClassMapper">
-    
+
     <resultMap type="TeachClass" id="TeachClassResult">
-        <result property="classId"    column="class_id"    />
-        <result property="name"    column="name"    />
-        <result property="deptId"    column="dept_id"    />
-        <result property="userId"    column="user_id"    />
-        <result property="status"    column="status"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
-        <result property="remark"    column="remark"    />
+        <result property="classId" column="class_id"/>
+        <result property="name" column="name"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
     <sql id="selectTeachClassVo">
-        select class_id, name, dept_id, user_id, status, create_time, update_time, remark from tb_teach_class
+        select class_id,
+               name,
+               dept_id,
+               user_id,
+               status,
+               create_time,
+               update_time,
+               remark
+        from tb_teach_class
     </sql>
 
     <select id="selectTeachClassList" parameterType="TeachClass" resultMap="TeachClassResult">
         <include refid="selectTeachClassVo"/>
-        <where>  
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="deptId != null "> and dept_id = #{deptId}</if>
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
+        <where>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
         </where>
     </select>
-    
+
     <select id="selectTeachClassByClassId" parameterType="Long" resultMap="TeachClassResult">
         <include refid="selectTeachClassVo"/>
         where class_id = #{classId}
@@ -38,18 +46,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             resultMap="TeachClassResult">
         <include refid="selectTeachClassVo"/>
         <where>
-                        <if test="name != null  and name != ''">
-                            and name like concat('%', #{name}, '%')
-                        </if>
-                        <if test="deptId != null ">
-                            and dept_id = #{deptId}
-                        </if>
-                        <if test="userId != null ">
-                            and user_id = #{userId}
-                        </if>
-                        <if test="status != null  and status != ''">
-                            and status = #{status}
-                        </if>
+            <if test="name != null  and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="deptId != null ">
+                and dept_id = #{deptId}
+            </if>
+            <if test="userId != null ">
+                and user_id = #{userId}
+            </if>
+            <if test="status != null  and status != ''">
+                and status = #{status}
+            </if>
             <!-- 数据范围过滤 -->
             ${entity.params.dataScope}
         </where>
@@ -65,7 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="remark != null">remark,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null and name != ''">#{name},</if>
             <if test="deptId != null">#{deptId},</if>
@@ -74,7 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="remark != null">#{remark},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateTeachClass" parameterType="TeachClass">
@@ -92,11 +100,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteTeachClassByClassId" parameterType="Long">
-        delete from tb_teach_class where class_id = #{classId}
+        delete
+        from tb_teach_class
+        where class_id = #{classId}
     </delete>
 
     <delete id="deleteTeachClassByClassIds" parameterType="String">
-        delete from tb_teach_class where class_id in 
+        delete from tb_teach_class where class_id in
         <foreach item="classId" collection="array" open="(" separator="," close=")">
             #{classId}
         </foreach>
