@@ -63,6 +63,7 @@ public class SysProfileController extends BaseController
         LoginUser loginUser = getLoginUser();
         SysUser sysUser = loginUser.getUser();
         user.setUserName(sysUser.getUserName());
+        user.setClassId(sysUser.getClassId());
         if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
         {

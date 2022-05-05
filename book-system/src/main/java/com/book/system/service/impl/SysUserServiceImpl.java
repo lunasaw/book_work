@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.book.work.domain.TeachClass;
+import com.book.work.mapper.TeachClassMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +64,9 @@ public class SysUserServiceImpl implements ISysUserService
     @Autowired
     protected Validator validator;
 
+    @Autowired
+    private TeachClassMapper teachClassMapper;
+
     /**
      * 根据条件分页查询用户列表
      * 
@@ -71,7 +77,13 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user)
     {
-        return userMapper.selectUserList(user);
+        List<SysUser> sysUsers = userMapper.selectUserList(user);
+        for (SysUser sysUser : sysUsers) {
+
+            TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(sysUser.getClassId());
+            sysUser.setClassName(teachClass.getName());
+        }
+        return sysUsers;
     }
 
     /**
@@ -84,7 +96,13 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user)
     {
-        return userMapper.selectAllocatedList(user);
+        List<SysUser> sysUsers = userMapper.selectAllocatedList(user);
+        for (SysUser sysUser : sysUsers) {
+
+            TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(sysUser.getClassId());
+            sysUser.setClassName(teachClass.getName());
+        }
+        return sysUsers;
     }
 
     /**
@@ -97,7 +115,13 @@ public class SysUserServiceImpl implements ISysUserService
     @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user)
     {
-        return userMapper.selectUnallocatedList(user);
+        List<SysUser> sysUsers = userMapper.selectUnallocatedList(user);
+        for (SysUser sysUser : sysUsers) {
+
+            TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(sysUser.getClassId());
+            sysUser.setClassName(teachClass.getName());
+        }
+        return sysUsers;
     }
 
     /**
@@ -109,7 +133,10 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public SysUser selectUserByUserName(String userName)
     {
-        return userMapper.selectUserByUserName(userName);
+        SysUser sysUser = userMapper.selectUserByUserName(userName);
+        TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(sysUser.getClassId());
+        sysUser.setClassName(teachClass.getName());
+        return sysUser;
     }
 
     /**
@@ -121,7 +148,10 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public SysUser selectUserById(Long userId)
     {
-        return userMapper.selectUserById(userId);
+        SysUser sysUser = userMapper.selectUserById(userId);
+        TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(sysUser.getClassId());
+        sysUser.setClassName(teachClass.getName());
+        return sysUser;
     }
 
     /**

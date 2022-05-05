@@ -7,6 +7,7 @@ import com.book.common.core.domain.BaseEntity;
 import com.book.common.core.domain.entity.SysDept;
 import com.book.system.domain.SysRoleDept;
 import com.book.work.domain.Course;
+import com.book.work.domain.TeachPlan;
 import lombok.Data;
 
 /**
@@ -29,7 +30,7 @@ public class TeachPlanVO extends BaseEntity {
 
     /** 专业名 */
     @Excel(name = "专业名")
-    private String            deptId;
+    private Long              deptId;
 
     /** 状态 */
     @Excel(name = "状态")
@@ -42,4 +43,24 @@ public class TeachPlanVO extends BaseEntity {
     private CourseVO          courseVO;
 
     private SysDept           sysDept;
+
+    public static TeachPlanVO convert(TeachPlan teachPlan) {
+        if (teachPlan == null) {
+            return new TeachPlanVO();
+        }
+        TeachPlanVO teachPlanVO = new TeachPlanVO();
+        teachPlanVO.setId(teachPlan.getId());
+        teachPlanVO.setCourseId(teachPlan.getCourseId());
+        teachPlanVO.setDeptId(teachPlan.getDeptId());
+        teachPlanVO.setStatus(teachPlan.getStatus());
+        teachPlanVO.setCheckStatus(teachPlan.getCheckStatus());
+        teachPlanVO.setSearchValue(teachPlan.getSearchValue());
+        teachPlanVO.setCreateBy(teachPlan.getCreateBy());
+        teachPlanVO.setCreateTime(teachPlan.getCreateTime());
+        teachPlanVO.setUpdateBy(teachPlan.getUpdateBy());
+        teachPlanVO.setUpdateTime(teachPlan.getUpdateTime());
+        teachPlanVO.setRemark(teachPlan.getRemark());
+        teachPlanVO.setParams(teachPlan.getParams());
+        return teachPlanVO;
+    }
 }

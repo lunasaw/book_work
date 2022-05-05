@@ -107,6 +107,20 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/book/',
+    component: Layout,
+    hidden: true,
+    permissions: ['book:course:list'],
+    children: [
+      {
+        path: 'course/:courseId(\\d+)',
+        component: () => import('@/views/book/course'),
+        name: 'AuthRole',
+        meta: { title: '查看课程', activeMenu: '/book/course' }
+      }
+    ]
+  },
+  {
     path: '/system/role-auth',
     component: Layout,
     hidden: true,

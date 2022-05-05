@@ -104,7 +104,19 @@
       <el-table-column label="课时" align="center" prop="hour"/>
       <el-table-column label="学期" align="center" prop="semester"/>
       <el-table-column label="学年" align="center" prop="year"/>
-      <el-table-column label="书籍列表" align="center" prop="books" />
+      <el-table-column label="书籍列表" align="center" prop="books" align-="center"  width="200px">
+        <template slot-scope="scope">
+          <el-select multiple v-model="scope.row.bookIds" laceholder="请输入课程名"
+          >
+            <el-option
+              v-for="item in scope.row.bookList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -153,7 +165,7 @@
         </el-form-item>
         <el-form-item label="书籍列表" prop="books">
           <el-select v-model="form.bookIds" multiple remote filterable size="medium"
-                     default-first-option multiple placeholder="请选择书籍列表"
+                     default-first-option placeholder="请选择书籍列表"
           >
             <el-option
               v-for="item in bookList"
@@ -179,6 +191,7 @@
 <script>
 import { listCourse, getCourse, delCourse, addCourse, updateCourse } from '@/api/book/course'
 import { listWork, getWork } from '@/api/book/work'
+import { getAuthRole } from '@/api/system/user'
 
 export default {
   name: 'Course',
@@ -229,6 +242,17 @@ export default {
     }
   },
   created() {
+    const courseId = this.$route.params && this.$route.params.courseId;
+    console.log(courseId)
+    if (courseId) {
+      this.loading = true;
+      this.queryParams.id = courseId;
+      listCourse(this.queryParams).then(response => {
+        this.courseList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
+    }
     this.getList()
   },
   methods: {
