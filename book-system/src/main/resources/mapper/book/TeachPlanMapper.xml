@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.work.mapper.TeachPlanMapper">
+
+    <resultMap type="TeachPlan" id="TeachPlanResult">
+        <result property="id" column="id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="status" column="status"/>
+        <result property="checkStatus" column="check_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectTeachPlanVo">
+        select id,
+               course_id,
+               dept_id,
+               status,
+               check_status,
+               create_time,
+               update_time,
+               update_by,
+               remark
+        from tb_teach_plan
+    </sql>
+
+    <select id="selectTeachPlanList" parameterType="TeachPlan" resultMap="TeachPlanResult">
+        <include refid="selectTeachPlanVo"/>
+        <where>
+            <if test="id != null ">and id = #{id}</if>
+            <if test="courseId != null ">and course_id = #{courseId}</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="status != null ">and status = #{status}</if>
+            <if test="checkStatus != null  and checkStatus != ''">and check_status = #{checkStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectTeachPlanById" parameterType="Long" resultMap="TeachPlanResult">
+        <include refid="selectTeachPlanVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachPlanPage" parameterType="com.book.work.domain.TeachPlan"
+            resultMap="TeachPlanResult">
+        <include refid="selectTeachPlanVo"/>
+        <where>
+            <if test="id != null ">
+                and id = #{id}
+            </if>
+            <if test="courseId != null ">
+                and course_id = #{courseId}
+            </if>
+            <if test="deptId != null ">
+                and dept_id = #{deptId}
+            </if>
+            <if test="status != null ">
+                and status = #{status}
+            </if>
+            <if test="checkStatus != null  and checkStatus != ''">
+                and check_status = #{checkStatus}
+            </if>
+            <!-- 数据范围过滤 -->
+            ${entity.params.dataScope}
+        </where>
+    </select>
+
+    <insert id="insertTeachPlan" parameterType="TeachPlan" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_teach_plan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">course_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="status != null">status,</if>
+            <if test="checkStatus != null and checkStatus != ''">check_status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="courseId != null">#{courseId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="checkStatus != null and checkStatus != ''">#{checkStatus},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTeachPlan" parameterType="TeachPlan">
+        update tb_teach_plan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="checkStatus != null and checkStatus != ''">check_status = #{checkStatus},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTeachPlanById" parameterType="Long">
+        delete
+        from tb_teach_plan
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteTeachPlanByIds" parameterType="String">
+        delete from tb_teach_plan where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

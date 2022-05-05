@@ -4,7 +4,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.book.work.domain.Course;
-import com.book.work.domain.CourseVO;
+import com.book.work.domain.vo.CourseVO;
 
 /**
  * 课程列Service接口

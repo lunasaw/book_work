@@ -3,13 +3,12 @@ package com.book.web.controller.work;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.book.work.domain.Book;
-import com.book.work.domain.CourseVO;
+import com.book.work.domain.vo.CourseVO;
 import com.book.work.service.IBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

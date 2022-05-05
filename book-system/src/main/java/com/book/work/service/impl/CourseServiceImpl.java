@@ -2,14 +2,11 @@ package com.book.work.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.book.common.utils.DateUtils;
 import com.book.work.domain.Book;
-import com.book.work.domain.CourseVO;
-import com.book.work.mapper.BookMapper;
-import net.sf.jsqlparser.statement.select.Join;
+import com.book.work.domain.vo.CourseVO;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +38,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         Course course = courseMapper.selectCourseById(id);
         List<Book> bookList = Lists.newArrayList();
         CourseVO convert = CourseVO.convert(course, bookList);
+
         bookList = bookService.selectBookList(new Book());
         convert.setBookList(bookList);
         return convert;

@@ -1,13 +1,14 @@
-package com.book.work.domain;
+package com.book.work.domain.vo;
 
 import com.book.common.annotation.Excel;
 import com.book.common.core.domain.BaseEntity;
 import com.book.common.utils.StringUtils;
+import com.book.work.domain.Book;
+import com.book.work.domain.Course;
 import lombok.Data;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -68,7 +69,7 @@ public class CourseVO extends BaseEntity {
 
     public static CourseVO convert(Course course, List<Book> bookList) {
         if (course == null) {
-            return null;
+            return new CourseVO();
         }
         CourseVO courseVO = new CourseVO();
         courseVO.setId(course.getId());
