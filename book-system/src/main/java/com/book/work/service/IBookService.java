@@ -24,6 +24,14 @@ public interface IBookService  extends IService<Book>
     public Book selectBookById(Long id);
 
     /**
+     * 查询书籍
+     *
+     * @param ids 书籍主键
+     * @return 书籍
+     */
+    public  List<Book> selectListByIds(List<Long> ids);
+
+    /**
      * 查询书籍列表
      * 
      * @param book 书籍

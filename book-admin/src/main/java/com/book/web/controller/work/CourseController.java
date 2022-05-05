@@ -1,12 +1,19 @@
 package com.book.web.controller.work;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.book.work.domain.Book;
+import com.book.work.domain.CourseVO;
+import com.book.work.service.IBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nonapi.io.github.classgraph.utils.Join;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +46,9 @@ public class CourseController extends BaseController {
     @Autowired
     private ICourseService courseService;
 
+    @Autowired
+    private IBookService bookService;
+
     /**
      * 查询课程列列表
      */
@@ -47,7 +57,8 @@ public class CourseController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo list(Course course) {
         startPage();
-        List<Course> list = courseService.selectCourseList(course);
+        List<CourseVO> list = courseService.selectCourseList(course);
+
         return getDataTable(list);
     }
 
@@ -63,6 +74,7 @@ public class CourseController extends BaseController {
         return getDataTable(list.getRecords());
     }
 
+
     /**
      * 导出课程列列表
      */
@@ -71,8 +83,14 @@ public class CourseController extends BaseController {
     @Log(title = "课程列", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, Course course) {
-        List<Course> list = courseService.selectCourseList(course);
-        ExcelUtil<Course> util = new ExcelUtil<Course>(Course.class);
+        List<CourseVO> list = courseService.selectCourseList(course);
+        for (CourseVO courseVO : list) {
+            List<Long> bookIds = Arrays.stream(course.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
+            List<Book> books = bookService.selectListByIds(bookIds);
+            List<String> bookNames = books.stream().map(Book::getName).collect(Collectors.toList());
+            courseVO.setBooks(Join.join(",", bookNames));
+        }
+        ExcelUtil<CourseVO> util = new ExcelUtil<CourseVO>(CourseVO.class);
         util.exportExcel(response, list, "课程列数据");
     }
 

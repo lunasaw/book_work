@@ -35,6 +35,17 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements IB
     }
 
     /**
+     * 查询书籍
+     *
+     * @param ids 书籍主键
+     * @return 书籍
+     */
+    @Override
+    public List<Book> selectListByIds(List<Long> ids){
+        return bookMapper.selectBatchIds(ids);
+    }
+
+    /**
      * 查询书籍列表
      * 
      * @param book 书籍

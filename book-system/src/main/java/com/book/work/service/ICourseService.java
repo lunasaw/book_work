@@ -4,6 +4,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.book.work.domain.Course;
+import com.book.work.domain.CourseVO;
 
 /**
  * 课程列Service接口
@@ -19,7 +20,9 @@ public interface ICourseService  extends IService<Course>
      * @param id 课程列主键
      * @return 课程列
      */
-    public Course selectCourseById(Long id);
+    public CourseVO selectCourseById(Long id);
+
+
 
     /**
      * 查询课程列列表
@@ -27,7 +30,7 @@ public interface ICourseService  extends IService<Course>
      * @param course 课程列
      * @return 课程列集合
      */
-    public List<Course> selectCourseList(Course course);
+    public List<CourseVO> selectCourseList(Course course);
 
     /**
      * 分页查询课程列列表

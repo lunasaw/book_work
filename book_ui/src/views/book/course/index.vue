@@ -41,6 +41,16 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="书籍列表" prop="books">
+        <el-select v-model="queryParams.books" placeholder="请选择书籍列表" clearable>
+          <el-option
+            v-for="dict in dict.type.tb_book_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -56,7 +66,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['book:course:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -67,7 +78,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['book:course:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -78,7 +90,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['book:course:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -88,20 +101,25 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['book:course:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="courseList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="课程ID" align="center" prop="id" />
-      <el-table-column label="课程名称" align="center" prop="name" />
-      <el-table-column label="课时" align="center" prop="hour" />
-      <el-table-column label="学期" align="center" prop="semester" />
-      <el-table-column label="学年" align="center" prop="year" />
-      <el-table-column label="书籍列表" align="center" prop="books" />
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column label="课程ID" align="center" prop="id"/>
+      <el-table-column label="课程名称" align="center" prop="name"/>
+      <el-table-column label="课时" align="center" prop="hour"/>
+      <el-table-column label="学期" align="center" prop="semester"/>
+      <el-table-column label="学年" align="center" prop="year"/>
+      <el-table-column label="书籍列表" align="center" prop="books">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.tb_book_status" :value="scope.row.books"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -110,18 +128,20 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['book:course:edit']"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['book:course:remove']"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -134,22 +154,30 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="课程名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入课程名称" />
+          <el-input v-model="form.name" placeholder="请输入课程名称"/>
         </el-form-item>
         <el-form-item label="课时" prop="hour">
-          <el-input v-model="form.hour" placeholder="请输入课时" />
+          <el-input v-model="form.hour" placeholder="请输入课时"/>
         </el-form-item>
         <el-form-item label="学期" prop="semester">
-          <el-input v-model="form.semester" placeholder="请输入学期" />
+          <el-input v-model="form.semester" placeholder="请输入学期"/>
         </el-form-item>
         <el-form-item label="学年" prop="year">
-          <el-input v-model="form.year" placeholder="请输入学年" />
+          <el-input v-model="form.year" placeholder="请输入学年"/>
         </el-form-item>
         <el-form-item label="书籍列表" prop="books">
-          <el-input v-model="form.books" type="textarea" placeholder="请输入内容" />
+
+          <el-select v-model="form.books" multiple placeholder="请选择书籍列表">
+            <el-option
+              v-for="item in bookList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -161,10 +189,12 @@
 </template>
 
 <script>
-import { listCourse, getCourse, delCourse, addCourse, updateCourse } from "@/api/book/course";
+import { listCourse, getCourse, delCourse, addCourse, updateCourse } from '@/api/book/course'
+import { listWork, getWork } from '@/api/book/work'
 
 export default {
-  name: "Course",
+  name: 'Course',
+  dicts: ['tb_book_status'],
   data() {
     return {
       // 遮罩层
@@ -181,8 +211,10 @@ export default {
       total: 0,
       // 课程列表格数据
       courseList: [],
+      // 书籍列表
+      bookList: [],
       // 弹出层标题
-      title: "",
+      title: '',
       // 是否显示弹出层
       open: false,
       // 查询参数
@@ -194,35 +226,35 @@ export default {
         hour: null,
         semester: null,
         year: null,
-        books: null,
+        books: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         name: [
-          { required: true, message: "课程名称不能为空", trigger: "blur" }
-        ],
+          { required: true, message: '课程名称不能为空', trigger: 'blur' }
+        ]
       }
-    };
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     /** 查询课程列列表 */
     getList() {
-      this.loading = true;
+      this.loading = true
       listCourse(this.queryParams).then(response => {
-        this.courseList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+        this.courseList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
     },
     // 取消按钮
     cancel() {
-      this.open = false;
-      this.reset();
+      this.open = false
+      this.reset()
     },
     // 表单重置
     reset() {
@@ -237,70 +269,72 @@ export default {
         updateBy: null,
         updateTime: null,
         remark: null
-      };
-      this.resetForm("form");
+      }
+      this.resetForm('form')
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
+      this.queryParams.pageNum = 1
+      this.getList()
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
+      this.resetForm('queryForm')
+      this.handleQuery()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加课程列";
+      this.reset()
+      this.open = true
+      this.title = '添加课程列'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
+      this.reset()
       const id = row.id || this.ids
       getCourse(id).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改课程列";
-      });
+        this.form = response.data
+        this.bookList = response.bookList
+        this.open = true
+        this.title = '修改课程列'
+      })
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate(valid => {
+      this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
             updateCourse(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
+              this.$modal.msgSuccess('修改成功')
+              this.open = false
+              this.getList()
+            })
           } else {
             addCourse(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
+              this.$modal.msgSuccess('新增成功')
+              this.open = false
+              this.getList()
+            })
           }
         }
-      });
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
+      const ids = row.id || this.ids
       this.$modal.confirm('是否确认删除课程列编号为"' + ids + '"的数据项？').then(function() {
-        return delCourse(ids);
+        return delCourse(ids)
       }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+        this.getList()
+        this.$modal.msgSuccess('删除成功')
+      }).catch(() => {
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -309,5 +343,5 @@ export default {
       }, `course_${new Date().getTime()}.xlsx`)
     }
   }
-};
+}
 </script>
