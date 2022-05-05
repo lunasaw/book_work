@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.work.mapper.CourseMapper">
+    
+    <resultMap type="Course" id="CourseResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="hour"    column="hour"    />
+        <result property="semester"    column="semester"    />
+        <result property="year"    column="year"    />
+        <result property="books"    column="books"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCourseVo">
+        select id, name, hour, semester, year, books, create_time, update_by, update_time, remark from tb_course
+    </sql>
+
+    <select id="selectCourseList" parameterType="Course" resultMap="CourseResult">
+        <include refid="selectCourseVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="hour != null "> and hour = #{hour}</if>
+            <if test="semester != null  and semester != ''"> and semester = #{semester}</if>
+            <if test="year != null  and year != ''"> and year = #{year}</if>
+            <if test="books != null  and books != ''"> and books like concat('%', #{books}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectCourseById" parameterType="Long" resultMap="CourseResult">
+        <include refid="selectCourseVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectCoursePage" parameterType="com.book.work.domain.Course"
+            resultMap="CourseResult">
+        <include refid="selectCourseVo"/>
+        <where>
+                        <if test="id != null ">
+                            and id = #{id}
+                        </if>
+                        <if test="name != null  and name != ''">
+                            and name like concat('%', #{name}, '%')
+                        </if>
+                        <if test="hour != null ">
+                            and hour = #{hour}
+                        </if>
+                        <if test="semester != null  and semester != ''">
+                            and semester = #{semester}
+                        </if>
+                        <if test="year != null  and year != ''">
+                            and year = #{year}
+                        </if>
+                        <if test="books != null  and books != ''">
+                            and books like concat('%', #{books}, '%')
+                        </if>
+            <!-- 数据范围过滤 -->
+            ${entity.params.dataScope}
+        </where>
+    </select>
+
+    <insert id="insertCourse" parameterType="Course" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="hour != null">hour,</if>
+            <if test="semester != null">semester,</if>
+            <if test="year != null">year,</if>
+            <if test="books != null">books,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="hour != null">#{hour},</if>
+            <if test="semester != null">#{semester},</if>
+            <if test="year != null">#{year},</if>
+            <if test="books != null">#{books},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCourse" parameterType="Course">
+        update tb_course
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="hour != null">hour = #{hour},</if>
+            <if test="semester != null">semester = #{semester},</if>
+            <if test="year != null">year = #{year},</if>
+            <if test="books != null">books = #{books},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCourseById" parameterType="Long">
+        delete from tb_course where id = #{id}
+    </delete>
+
+    <delete id="deleteCourseByIds" parameterType="String">
+        delete from tb_course where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
