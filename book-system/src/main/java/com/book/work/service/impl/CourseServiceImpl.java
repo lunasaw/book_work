@@ -73,7 +73,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     public List<CourseVO> selectCourseList(Course course) {
         List<Course> courses = courseMapper.selectCourseList(course);
         List<CourseVO> collect = courses.stream().map(e -> {
-            List<Long> bookIds = Arrays.stream(Optional.ofNullabel(e.getBooks()).split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
+            List<Long> bookIds = Arrays.stream(Optional.ofNullabel(e.getBooks()).orElse("").split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
             List<Book> books = new ArrayList<>();
             if (!CollectionUtils.isEmpty(bookIds)){
                 books = bookService.selectListByIds(bookIds);

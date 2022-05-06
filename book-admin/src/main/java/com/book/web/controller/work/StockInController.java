@@ -2,6 +2,8 @@ package com.book.web.controller.work;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.book.work.domain.vo.StockInVO;
@@ -52,8 +54,9 @@ public class StockInController extends BaseController
         startPage();
         List<StockInVO> list = stockInService.selectStockInList(stockIn);
         long count = stockInService.count(new QueryWrapper<>(stockIn));
+        TableDataInfo dataTable = getDataTable(list);
         dataTable.setTotal(count);
-        return getDataTable(list);
+        return dataTable;
     }
 
     /**
