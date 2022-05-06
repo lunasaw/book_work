@@ -8,6 +8,8 @@ import com.book.common.core.domain.entity.SysDept;
 import com.book.common.core.domain.entity.SysUser;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 班级列表对象 tb_teach_class
  *
@@ -43,6 +45,14 @@ public class TeachClassVO extends BaseEntity {
     /** 0表示未删除，1表示已删除 */
     @Excel(name = "0表示未删除，1表示已删除")
     private String            status;
+
+    /** 班级人数 */
+    @Excel(name = "班级人数")
+    private Integer           classSize;
+
+    /** 缴费金额 */
+    @Excel(name = "缴费金额")
+    private BigDecimal        payCost;
 
     private SysDept           sysDept;
 

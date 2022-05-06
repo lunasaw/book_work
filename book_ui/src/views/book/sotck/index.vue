@@ -202,6 +202,9 @@ import {
   updateTeachclass,
   listTeachClassStuList
 } from '@/api/book/teachclass'
+
+import { listWithChecked, listWork, getWork } from '@/api/book/work'
+
 import { treeselect } from '@/api/system/dept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -340,8 +343,13 @@ export default {
       this.getTreeselect(row.sysUser.classId)
       getSotck(id).then(response => {
         this.form = response.data;
-        this.bookList = response.data.bookList
-        this.open = true;
+        listWithChecked().then(response => {
+          this.bookList = response.rows
+          console.log(
+            this.bookList
+          )
+          this.open = true
+        })
         this.title = "修改书籍领取列";
       });
     },

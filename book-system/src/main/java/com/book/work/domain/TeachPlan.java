@@ -13,7 +13,7 @@ import lombok.Data;
  * @date 2022-05-05
  */
 @Data
-@TableName("teach_paln")
+@TableName("tb_teach_plan")
 public class TeachPlan extends BaseEntity {
     private static final long serialVersionUID = 1L;
 

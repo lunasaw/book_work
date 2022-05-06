@@ -1,5 +1,6 @@
 package com.book.work.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,8 +13,10 @@ import com.book.common.utils.StringUtils;
 import com.book.system.mapper.SysDeptMapper;
 import com.book.system.mapper.SysUserMapper;
 import com.book.work.domain.Book;
+import com.book.work.domain.TeachClass;
 import com.book.work.domain.vo.StockInVO;
 import com.book.work.mapper.BookMapper;
+import com.book.work.mapper.TeachClassMapper;
 import com.fasterxml.jackson.databind.util.BeanUtil;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +47,10 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
 
     @Autowired
     private SysUserMapper sysUserMapper;
+
+    @Autowired
+    private TeachClassMapper teachClassMapper;
+
 
     /**
      * 查询书籍领取列
@@ -137,6 +144,19 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
     @Override
     public int updateStockIn(StockIn stockIn) {
         stockIn.setUpdateTime(DateUtils.getNowDate());
+        StockIn stockIn1 = stockInMapper.selectStockInById(stockIn.getId());
+        if ("0".equals(stockIn.getStockStatus()) && "1".equals(stockIn1.getStockStatus())){
+            // 修改领取的钱
+            List<Long> bookIds = stockIn.getBookIds();
+            List<Book> books = bookMapper.selectBatchIds(bookIds);
+            double sum = books.stream().mapToDouble(Book::getPrice).sum();
+            Long userId = stockIn1.getUserId();
+            Long classId = sysUserMapper.selectUserById(userId).getClassId();
+            TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(classId);
+            BigDecimal subtract = new BigDecimal(teachClass.getPayCost()).subtract(BigDecimal.valueOf(sum));
+            teachClass.setPayCost(subtract.toString());
+        }
+
         return stockInMapper.updateStockIn(stockIn);
     }
 

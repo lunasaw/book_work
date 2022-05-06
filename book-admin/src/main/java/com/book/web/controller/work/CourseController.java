@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.book.work.domain.Book;
@@ -57,12 +58,10 @@ public class CourseController extends BaseController {
     public TableDataInfo list(Course course) {
         startPage();
         List<CourseVO> list = courseService.selectCourseList(course);
-        for (CourseVO courseVO : list) {
-            List<Book> books = courseVO.getBookList();
-            List<String> bookNames = books.stream().map(Book::getName).collect(Collectors.toList());
-            courseVO.setBooks(Join.join(",", bookNames));
-        }
-        return getDataTable(list);
+        TableDataInfo dataTable = getDataTable(list);
+        long count = courseService.count(new QueryWrapper<>(course));
+        dataTable.setTotal(count);
+        return dataTable;
     }
 
     /**

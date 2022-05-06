@@ -28,6 +28,14 @@ public class TeachClass extends BaseEntity {
     @Excel(name = "专业ID")
     private Long              deptId;
 
+    /** 班级人数 */
+    @Excel(name = "班级人数")
+    private Integer           classSize;
+
+    /** 缴费金额 */
+    @Excel(name = "缴费金额")
+    private String            payCost;
+
     /** 班级负责人的用户ID */
     @Excel(name = "班级负责人的用户ID")
     private Long              userId;

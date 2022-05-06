@@ -10,6 +10,8 @@ import com.book.work.domain.Course;
 import com.book.work.domain.TeachPlan;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 教学计划对象 tb_teach_plan
  *
@@ -39,6 +41,7 @@ public class TeachPlanVO extends BaseEntity {
     /** 是否审核 */
     @Excel(name = "是否审核")
     private String            checkStatus;
+
 
     private CourseVO          courseVO;
 

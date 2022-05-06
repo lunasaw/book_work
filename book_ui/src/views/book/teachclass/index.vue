@@ -17,6 +17,22 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="班级人数" prop="classSize">
+        <el-input
+          v-model="queryParams.classSize"
+          placeholder="请输入班级人数"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="缴费金额" prop="payCost">
+        <el-input
+          v-model="queryParams.payCost"
+          placeholder="请输入缴费金额"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="班级负责人ID" prop="userId" label-width="200px">
         <el-input
           v-model="queryParams.userId"
@@ -87,7 +103,8 @@
       <el-table-column label="班级名" align="center" prop="name"/>
       <el-table-column label="专业" align="center" prop="deptName"/>
       <el-table-column label="班级负责人" align="center" prop="userName"/>
-
+      <el-table-column label="班级人数" align="center" prop="classSize" />
+      <el-table-column label="缴费金额" align="center" prop="payCost" />
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_common_status" :value="scope.row.status"/>
@@ -147,6 +164,12 @@
               :value="item.userId"
             ></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="班级人数" prop="classSize">
+          <el-input v-model="form.classSize" placeholder="请输入班级人数" />
+        </el-form-item>
+        <el-form-item label="缴费金额" prop="payCost">
+          <el-input v-model="form.payCost" placeholder="请输入缴费金额" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>

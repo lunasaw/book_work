@@ -32,6 +32,16 @@ public interface ICourseService  extends IService<Course>
      */
     public List<CourseVO> selectCourseList(Course course);
 
+
+
+    /**
+     * 查询课程列列表
+     *
+     * @param course 课程列
+     * @return 课程列集合
+     */
+    public List<CourseVO> selectCourseList(Course course, Integer pageNum, Integer pageSize);
+
     /**
      * 分页查询课程列列表
      *

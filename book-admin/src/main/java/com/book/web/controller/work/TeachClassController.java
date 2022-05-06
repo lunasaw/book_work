@@ -2,6 +2,8 @@ package com.book.web.controller.work;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.book.common.core.domain.entity.SysUser;
@@ -53,7 +55,11 @@ public class TeachClassController extends BaseController {
     public TableDataInfo list(TeachClass teachClass) {
         startPage();
         List<TeachClassVO> list = teachClassService.selectTeachClassList(teachClass);
-        return getDataTable(list);
+
+        TableDataInfo dataTable = getDataTable(list);
+        long count = teachClassService.count(new QueryWrapper<>(teachClass));
+        dataTable.setTotal(count);
+        return dataTable;
     }
 
     /**

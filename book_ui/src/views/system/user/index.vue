@@ -212,6 +212,18 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
+            <el-form-item label="班级" prop="userId" label-width="100px">
+              <el-select v-model="form.classId" placeholder="请选择班级">
+                <el-option
+                  v-for="item in classList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="归属部门" prop="deptId">
               <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true" placeholder="请选择归属部门" />
             </el-form-item>
@@ -346,7 +358,14 @@ import { getToken } from "@/utils/auth";
 import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-
+import {
+  listTeachclass,
+  getTeachclass,
+  delTeachclass,
+  addTeachclass,
+  updateTeachclass,
+  listTeachClassStuList
+} from '@/api/book/teachclass'
 export default {
   name: "User",
   dicts: ['sys_normal_disable', 'sys_user_sex'],
@@ -379,6 +398,8 @@ export default {
       initPassword: undefined,
       // 日期范围
       dateRange: [],
+      // 班级列表
+      classList: [],
       // 岗位选项
       postOptions: [],
       // 角色选项
@@ -462,6 +483,7 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
+
     this.getConfigKey("sys.user.initPassword").then(response => {
       this.initPassword = response.msg;
     });
@@ -481,6 +503,9 @@ export default {
     getTreeselect() {
       treeselect().then(response => {
         this.deptOptions = response.data;
+      });
+      listTeachclass().then(response => {
+        this.classList = response.row;
       });
     },
     // 筛选节点

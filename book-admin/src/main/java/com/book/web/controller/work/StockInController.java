@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.book.work.domain.vo.StockInVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import nonapi.io.github.classgraph.utils.Join;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -111,6 +112,9 @@ public class StockInController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody StockIn stockIn)
     {
+
+        String books = Join.join(",", stockIn.getBookIds());
+        stockIn.setBooks(books);
         return toAjax(stockInService.updateStockIn(stockIn));
     }
 

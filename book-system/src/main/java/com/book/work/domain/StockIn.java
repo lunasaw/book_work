@@ -1,8 +1,11 @@
 package com.book.work.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.book.common.annotation.Excel;
 import com.book.common.core.domain.BaseEntity;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 书籍领取列对象 tb_stock_in
@@ -32,5 +35,8 @@ public class StockIn extends BaseEntity {
     /** 书籍列表 */
     @Excel(name = "书籍列表")
     private String            books;
+
+    @TableField(exist = false)
+    private List<Long>        bookIds;
 
 }

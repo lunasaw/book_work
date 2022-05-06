@@ -1,5 +1,6 @@
 package com.book.work.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,9 @@ public class TeachClassServiceImpl extends ServiceImpl<TeachClassMapper, TeachCl
         SysDept sysDept = deptService.selectDeptById(teachClass.getDeptId());
         teachClassVO.setDeptName(sysDept.getDeptName());
         teachClassVO.setSysDept(sysDept);
+
+        teachClassVO.setPayCost(new BigDecimal(teachClass.getPayCost()));
+        teachClassVO.setClassSize(teachClass.getClassSize());
         return teachClassVO;
     }
 
@@ -79,6 +83,8 @@ public class TeachClassServiceImpl extends ServiceImpl<TeachClassMapper, TeachCl
             teachClassVO.setDeptName(sysDept.getDeptName());
             teachClassVO.setSysDept(sysDept);
 
+            teachClassVO.setPayCost(new BigDecimal(clazz.getPayCost()));
+            teachClassVO.setClassSize(clazz.getClassSize());
             list.add(teachClassVO);
         }
         return list;

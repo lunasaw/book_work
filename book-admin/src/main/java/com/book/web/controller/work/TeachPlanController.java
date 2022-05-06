@@ -2,6 +2,8 @@ package com.book.web.controller.work;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.book.work.domain.vo.TeachPlanVO;
@@ -50,7 +52,11 @@ public class TeachPlanController extends BaseController
     {
         startPage();
         List<TeachPlanVO> list = teachPlanService.selectTeachPlanList(teachPlan);
-        return getDataTable(list);
+
+        TableDataInfo dataTable = getDataTable(list);
+        long count = teachPlanService.count(new QueryWrapper<>(teachPlan));
+        dataTable.setTotal(count);
+        return dataTable;
     }
 
     /**

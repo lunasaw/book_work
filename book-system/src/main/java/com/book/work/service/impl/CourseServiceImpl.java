@@ -2,19 +2,27 @@ package com.book.work.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.book.common.utils.DateUtils;
-import com.book.work.domain.Book;
+import com.book.common.utils.PageUtils;
+import com.book.work.domain.*;
 import com.book.work.domain.vo.CourseVO;
+import com.book.work.mapper.StockInMapper;
+import com.book.work.mapper.TeachClassMapper;
+import com.book.work.mapper.TeachPlanMapper;
+import com.github.pagehelper.PageHelper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.book.work.mapper.CourseMapper;
-import com.book.work.domain.Course;
 import com.book.work.service.ICourseService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 课程列Service业务层处理
@@ -27,6 +35,15 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Autowired
     private CourseMapper courseMapper;
 
+    @Autowired
+    private TeachPlanMapper teachPlanMapper;
+
+    @Autowired
+    private TeachClassMapper teachClassMapper;
+
+    @Autowired
+    private StockInMapper stockInMapper;
+
     /**
      * 查询课程列
      *
@@ -38,7 +55,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         Course course = courseMapper.selectCourseById(id);
         List<Book> bookList = Lists.newArrayList();
         CourseVO convert = CourseVO.convert(course, bookList);
-        bookList = bookService.selectListByIds(convert.getBookIds());
+        if(CollectionUtils.isNotEmpty(convert.getBookIds())){
+            bookList = bookService.selectListByIds(convert.getBookIds());
+        }
         convert.setBookList(bookList);
         return convert;
     }
@@ -60,7 +79,18 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             List<Book> books = bookService.selectListByIds(bookIds);
             return CourseVO.convert(e, books);
         }).collect(Collectors.toList());
+        PageUtils.startPage();
+        return collect;
+    }
 
+    public List<CourseVO> selectCourseList(Course course, Integer pageNum, Integer pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+        List<Course> courses = courseMapper.selectCourseList(course);
+        List<CourseVO> collect = courses.stream().map(e -> {
+            List<Long> bookIds = Arrays.stream(e.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
+            List<Book> books = bookService.selectListByIds(bookIds);
+            return CourseVO.convert(e, books);
+        }).collect(Collectors.toList());
         return collect;
     }
 
@@ -97,6 +127,42 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public int updateCourse(Course course) {
         course.setUpdateTime(DateUtils.getNowDate());
+        Course course1 = courseMapper.selectCourseById(course.getId());
+
+        String[] course1books = Optional.ofNullable(course1.getBooks()).map(e -> e.split(",")).orElse(new String[]{});
+        List<Long> course1booksLong = Arrays.stream(course1books).map(Long::valueOf).collect(Collectors.toList());
+
+        String[] course2books = Optional.ofNullable(course.getBooks()).map(e -> e.split(",")).orElse(new String[]{});
+        List<Long> course2booksLong = Arrays.stream(course2books).map(Long::valueOf).collect(Collectors.toList());
+        for (Long aLong : course2booksLong) {
+            if (course1booksLong.contains(aLong)) {
+                continue;
+            }
+            Book book = bookService.selectBookById(aLong);
+            if (Objects.nonNull(book)){
+                // 领取增加记录
+                StockIn stockIn = new StockIn();
+                stockIn.setBooks(aLong.toString());
+
+                TeachPlan teachPlan = new TeachPlan();
+                teachPlan.setCourseId(course.getId());
+                List<TeachPlan> teachPlans = teachPlanMapper.selectTeachPlanList(teachPlan);
+                for (TeachPlan plan : teachPlans) {
+                    Long deptId = plan.getDeptId();
+                    TeachClass teachClass = new TeachClass();
+                    teachClass.setDeptId(deptId);
+                    List<TeachClass> teachClasses = teachClassMapper.selectTeachClassList(teachClass);
+                    for (TeachClass aClass : teachClasses) {
+
+                        stockIn.setDeptId(deptId);
+                        stockIn.setUserId(aClass.getUserId());
+                        stockIn.setStockStatus("1");
+                        stockInMapper.insertStockIn(stockIn);
+                    }
+                }
+            }
+        }
+
         return courseMapper.updateCourse(course);
     }
 
