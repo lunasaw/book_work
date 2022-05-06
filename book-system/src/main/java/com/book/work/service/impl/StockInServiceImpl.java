@@ -37,20 +37,19 @@ import com.book.work.service.IStockInService;
 @Service
 public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> implements IStockInService {
     @Autowired
-    private StockInMapper stockInMapper;
+    private StockInMapper    stockInMapper;
 
     @Autowired
-    private BookMapper    bookMapper;
+    private BookMapper       bookMapper;
 
     @Autowired
-    private SysDeptMapper sysDeptMapper;
+    private SysDeptMapper    sysDeptMapper;
 
     @Autowired
-    private SysUserMapper sysUserMapper;
+    private SysUserMapper    sysUserMapper;
 
     @Autowired
     private TeachClassMapper teachClassMapper;
-
 
     /**
      * 查询书籍领取列
@@ -62,8 +61,9 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
     public StockInVO selectStockInById(Long id) {
         StockIn stockIn = stockInMapper.selectStockInById(id);
         StockInVO stockInVO = new StockInVO();
-        BeanUtils.copyProperties(stockIn,stockInVO);
-        List<Long> collect = Arrays.stream(stockIn.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
+        BeanUtils.copyProperties(stockIn, stockInVO);
+        List<Long> collect =
+            Arrays.stream(stockIn.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
         List<Book> books = bookMapper.selectBatchIds(collect);
         stockInVO.setBookIds(collect);
         stockInVO.setBookList(books);
@@ -90,8 +90,9 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
         List<StockIn> stockIns = stockInMapper.selectStockInList(stockIn);
         for (StockIn in : stockIns) {
             StockInVO stockInVO = new StockInVO();
-            BeanUtils.copyProperties(in,stockInVO);
-            List<Long> collect = Arrays.stream(in.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
+            BeanUtils.copyProperties(in, stockInVO);
+            List<Long> collect =
+                Arrays.stream(in.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
             List<Book> books = bookMapper.selectBatchIds(collect);
             stockInVO.setBookIds(collect);
             stockInVO.setBookList(books);
@@ -145,7 +146,7 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
     public int updateStockIn(StockIn stockIn) {
         stockIn.setUpdateTime(DateUtils.getNowDate());
         StockIn stockIn1 = stockInMapper.selectStockInById(stockIn.getId());
-        if ("0".equals(stockIn.getStockStatus()) && "1".equals(stockIn1.getStockStatus())){
+        if ("0".equals(stockIn.getStockStatus()) && "1".equals(stockIn1.getStockStatus())) {
             // 修改领取的钱
             List<Long> bookIds = stockIn.getBookIds();
             List<Book> books = bookMapper.selectBatchIds(bookIds);
@@ -153,7 +154,8 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
             Long userId = stockIn1.getUserId();
             Long classId = sysUserMapper.selectUserById(userId).getClassId();
             TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(classId);
-            BigDecimal subtract = new BigDecimal(teachClass.getPayCost()).subtract(BigDecimal.valueOf(sum));
+            BigDecimal subtract =
+                new BigDecimal(teachClass.getPayCost()).subtract(BigDecimal.valueOf(sum).multiply(BigDecimal.valueOf(teachClass.getClassSize())));
             teachClass.setPayCost(subtract.toString());
             teachClassMapper.updateTeachClass(teachClass);
         }
