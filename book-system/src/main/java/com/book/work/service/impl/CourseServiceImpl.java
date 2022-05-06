@@ -38,8 +38,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         Course course = courseMapper.selectCourseById(id);
         List<Book> bookList = Lists.newArrayList();
         CourseVO convert = CourseVO.convert(course, bookList);
-
-        bookList = bookService.selectBookList(new Book());
+        bookList = bookService.selectListByIds(convert.getBookIds());
         convert.setBookList(bookList);
         return convert;
     }

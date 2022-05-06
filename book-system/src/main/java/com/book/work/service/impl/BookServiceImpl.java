@@ -1,7 +1,10 @@
 package com.book.work.service.impl;
 
 import java.util.List;
+
+import com.book.common.exception.ServiceException;
 import com.book.common.utils.DateUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -79,6 +82,10 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements IB
     public int insertBook(Book book)
     {
         book.setCreateTime(DateUtils.getNowDate());
+        List<Book> books = bookMapper.selectBookList(book);
+        if (CollectionUtils.isNotEmpty(books)){
+            throw new ServiceException("同型号书已存在");
+        }
         return bookMapper.insertBook(book);
     }
 

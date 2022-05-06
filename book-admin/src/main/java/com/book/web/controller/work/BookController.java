@@ -52,6 +52,18 @@ public class BookController extends BaseController {
     }
 
     /**
+     * 查询审核过的书籍列表
+     */
+    @ApiOperation(value = "查询审核过的列表")
+    @PreAuthorize("@ss.hasPermi('book:work:list')")
+    @GetMapping("/listWithChecked")
+    public TableDataInfo listWithChecked(Book book) {
+        book.setCheckStatus("0");
+        List<Book> list = bookService.selectBookList(book);
+        return getDataTable(list);
+    }
+
+    /**
      * 分页查询书籍列表
      */
     @ApiOperation(value = "分页查询书籍列表")

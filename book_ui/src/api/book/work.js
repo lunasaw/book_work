@@ -9,6 +9,14 @@ export function listWork(query) {
   })
 }
 
+// 查询已经审核过的书籍列表
+export function listWithChecked() {
+  return request({
+    url: '/book/work/listWithChecked',
+    method: 'get',
+  })
+}
+
 // 显式分页查询书籍列表
 export function workPageList(query) {
     return request({

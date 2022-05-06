@@ -151,19 +151,19 @@
     <!-- 添加或修改课程列对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程名称" prop="name">
+        <el-form-item label="课程名称" prop="name" v-if="checkPermi(['book:course:add'])">
           <el-input v-model="form.name" placeholder="请输入课程名称"/>
         </el-form-item>
-        <el-form-item label="课时" prop="hour">
-          <el-input v-model="form.hour" placeholder="请输入课时"/>
+        <el-form-item label="课时" prop="hour" v-if="checkPermi(['book:course:add'])">
+          <el-input v-model="form.hour" placeholder="请输入课时" />
         </el-form-item>
-        <el-form-item label="学期" prop="semester">
+        <el-form-item label="学期" prop="semester" v-if="checkPermi(['book:course:add'])">
           <el-input v-model="form.semester" placeholder="请输入学期"/>
         </el-form-item>
-        <el-form-item label="学年" prop="year">
+        <el-form-item label="学年" prop="year" v-if="checkPermi(['book:course:add'])">
           <el-input v-model="form.year" placeholder="请输入学年"/>
         </el-form-item>
-        <el-form-item label="书籍列表" prop="books">
+        <el-form-item label="书籍列表" prop="books" v-if="checkPermi(['book:course:edit'])" >
           <el-select v-model="form.bookIds" multiple remote filterable size="medium"
                      default-first-option placeholder="请选择书籍列表"
           >
@@ -172,7 +172,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.id"
-              :disabled="item.status === 1"
+              :disabled="item.status === 0"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -190,11 +190,13 @@
 
 <script>
 import { listCourse, getCourse, delCourse, addCourse, updateCourse } from '@/api/book/course'
-import { listWork, getWork } from '@/api/book/work'
+import { listWithChecked, listWork, getWork } from '@/api/book/work'
 import { getAuthRole } from '@/api/system/user'
+import { checkPermi, checkRole } from "@/utils/permission"; // 权限判断函数
 
 export default {
   name: 'Course',
+  checkPermi,
   dicts: ['tb_book_status'],
   data() {
     return {
@@ -256,6 +258,7 @@ export default {
     this.getList()
   },
   methods: {
+    checkPermi,
     /** 查询课程列列表 */
     getList() {
       this.loading = true
@@ -312,14 +315,21 @@ export default {
     handleUpdate(row) {
       this.reset()
       const id = row.id || this.ids
-      getCourse(id).then(response => {
+      getCourse(id).then(response => {  
         this.form = response.data
-        this.bookList = this.form.bookList
+
         this.bookIds = this.form.bookIds
         console.log(this.bookIds)
-        this.open = true
+        listWithChecked().then(response => {
+          this.bookList = response.rows
+          console.log(
+            this.bookList
+          )
+          this.open = true
+        })
         this.title = '修改课程列'
       })
+
     },
     /** 提交按钮 */
     submitForm() {
