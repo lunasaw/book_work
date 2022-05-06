@@ -213,7 +213,7 @@
 
 <script>
 import { listPlan, getPlan, delPlan, addPlan, updatePlan } from '@/api/book/plan'
-import { listCourse, getCourse, delCourse, addCourse, updateCourse } from '@/api/book/course'
+import { listCourse, listAllCourse, getCourse, delCourse, addCourse, updateCourse } from '@/api/book/course'
 import { treeselect } from '@/api/system/dept'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -284,7 +284,7 @@ export default {
         this.total = response.total
         this.loading = false
       })
-      listCourse().then(response => {
+      listAllCourse().then(response => {
         this.courseList = response.rows
       })
     },

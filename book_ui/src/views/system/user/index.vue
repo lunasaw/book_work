@@ -211,18 +211,7 @@
               <el-input v-model="form.nickName" placeholder="请输入用户昵称" maxlength="30" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="班级" prop="userId" label-width="100px">
-              <el-select v-model="form.classId" placeholder="请选择班级">
-                <el-option
-                  v-for="item in classList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
+
           <el-col :span="12">
             <el-form-item label="归属部门" prop="deptId">
               <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true" placeholder="请选择归属部门" />
@@ -307,6 +296,18 @@
           </el-col>
         </el-row>
         <el-row>
+          <el-col :span="12">
+            <el-form-item label="班级"  >
+              <el-select v-model="form.classId" placeholder="请选择班级">
+                <el-option
+                  v-for="item in classList"
+                  :key="item.classId"
+                  :label="item.name"
+                  :value="item.classId"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
           <el-col :span="24">
             <el-form-item label="备注">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
@@ -505,7 +506,8 @@ export default {
         this.deptOptions = response.data;
       });
       listTeachclass().then(response => {
-        this.classList = response.row;
+        this.classList = response.rows;
+        console.log(this.classList)
       });
     },
     // 筛选节点
@@ -543,6 +545,7 @@ export default {
         nickName: undefined,
         password: undefined,
         phonenumber: undefined,
+        classId: undefined,
         email: undefined,
         sex: undefined,
         status: "0",
@@ -605,7 +608,14 @@ export default {
         this.roleOptions = response.roles;
         this.form.postIds = response.postIds;
         this.form.roleIds = response.roleIds;
-        this.open = true;
+        let query = {
+          detpId : this.form.deptId
+        }
+        listTeachclass(query).then(response => {
+          this.classList = response.rows;
+          console.log(this.classList)
+          this.open = true;
+        });
         this.title = "修改用户";
         this.form.password = "";
       });

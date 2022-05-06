@@ -165,21 +165,6 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="书籍列表" prop="books">
-          <el-select v-model="form.bookIds" multiple remote filterable size="medium"
-                     default-first-option placeholder="请选择书籍列表"
-          >
-            <el-option
-              v-for="item in bookList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-              :disabled="item.status === 1"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-
-
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>

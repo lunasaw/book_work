@@ -1,5 +1,6 @@
 package com.book.web.controller.work;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,12 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.book.common.utils.StringUtils;
 import com.book.work.domain.Book;
 import com.book.work.domain.vo.CourseVO;
 import com.book.work.service.IBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import nonapi.io.github.classgraph.utils.Join;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +68,20 @@ public class CourseController extends BaseController {
     }
 
     /**
+     * 查询课程列列表
+     */
+    @ApiOperation(value = "查询课程列列表")
+    @PreAuthorize("@ss.hasPermi('book:course:list')")
+    @GetMapping("/listAll")
+    public TableDataInfo listAll(Course course) {
+        List<CourseVO> list = courseService.selectCourseList(course);
+        TableDataInfo dataTable = getDataTable(list);
+        long count = courseService.count(new QueryWrapper<>(course));
+        dataTable.setTotal(count);
+        return dataTable;
+    }
+
+    /**
      * 分页查询课程列列表
      */
     @ApiOperation(value = "分页查询课程列列表")
@@ -87,8 +104,11 @@ public class CourseController extends BaseController {
     public void export(HttpServletResponse response, Course course) {
         List<CourseVO> list = courseService.selectCourseList(course);
         for (CourseVO courseVO : list) {
-            List<Long> bookIds = Arrays.stream(course.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
-            List<Book> books = bookService.selectListByIds(bookIds);
+            List<Long> bookIds = Arrays.stream(course.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
+            List<Book> books = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(bookIds)){
+                books = bookService.selectListByIds(bookIds);
+            }
             List<String> bookNames = books.stream().map(Book::getName).collect(Collectors.toList());
             courseVO.setBooks(Join.join(",", bookNames));
         }

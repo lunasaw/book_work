@@ -9,6 +9,15 @@ export function listCourse(query) {
   })
 }
 
+// 查询课程列列表
+export function listAllCourse(query) {
+  return request({
+    url: '/book/course/listAll',
+    method: 'get',
+    params: query
+  })
+}
+
 // 显式分页查询课程列列表
 export function coursePageList(query) {
     return request({

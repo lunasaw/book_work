@@ -63,7 +63,7 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
         StockIn stockIn = stockInMapper.selectStockInById(id);
         StockInVO stockInVO = new StockInVO();
         BeanUtils.copyProperties(stockIn,stockInVO);
-        List<Long> collect = Arrays.stream(stockIn.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> collect = Arrays.stream(stockIn.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
         List<Book> books = bookMapper.selectBatchIds(collect);
         stockInVO.setBookIds(collect);
         stockInVO.setBookList(books);
@@ -91,7 +91,7 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
         for (StockIn in : stockIns) {
             StockInVO stockInVO = new StockInVO();
             BeanUtils.copyProperties(in,stockInVO);
-            List<Long> collect = Arrays.stream(in.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
+            List<Long> collect = Arrays.stream(in.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
             List<Book> books = bookMapper.selectBatchIds(collect);
             stockInVO.setBookIds(collect);
             stockInVO.setBookList(books);
@@ -155,6 +155,7 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
             TeachClass teachClass = teachClassMapper.selectTeachClassByClassId(classId);
             BigDecimal subtract = new BigDecimal(teachClass.getPayCost()).subtract(BigDecimal.valueOf(sum));
             teachClass.setPayCost(subtract.toString());
+            teachClassMapper.updateTeachClass(teachClass);
         }
 
         return stockInMapper.updateStockIn(stockIn);

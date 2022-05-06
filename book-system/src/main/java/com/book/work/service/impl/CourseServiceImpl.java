@@ -1,13 +1,11 @@
 package com.book.work.service.impl;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.book.common.utils.DateUtils;
 import com.book.common.utils.PageUtils;
+import com.book.common.utils.StringUtils;
 import com.book.work.domain.*;
 import com.book.work.domain.vo.CourseVO;
 import com.book.work.mapper.StockInMapper;
@@ -75,8 +73,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     public List<CourseVO> selectCourseList(Course course) {
         List<Course> courses = courseMapper.selectCourseList(course);
         List<CourseVO> collect = courses.stream().map(e -> {
-            List<Long> bookIds = Arrays.stream(e.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
-            List<Book> books = bookService.selectListByIds(bookIds);
+            List<Long> bookIds = Arrays.stream(e.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
+            List<Book> books = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(bookIds)){
+                books = bookService.selectListByIds(bookIds);
+            }
             return CourseVO.convert(e, books);
         }).collect(Collectors.toList());
         PageUtils.startPage();
@@ -87,8 +88,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         PageHelper.startPage(pageNum, pageSize);
         List<Course> courses = courseMapper.selectCourseList(course);
         List<CourseVO> collect = courses.stream().map(e -> {
-            List<Long> bookIds = Arrays.stream(e.getBooks().split(",")).map(Long::valueOf).collect(Collectors.toList());
-            List<Book> books = bookService.selectListByIds(bookIds);
+            List<Long> bookIds = Arrays.stream(e.getBooks().split(",")).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
+            List<Book> books = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(bookIds)){
+                books = bookService.selectListByIds(bookIds);
+            }
             return CourseVO.convert(e, books);
         }).collect(Collectors.toList());
         return collect;
@@ -130,10 +134,10 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         Course course1 = courseMapper.selectCourseById(course.getId());
 
         String[] course1books = Optional.ofNullable(course1.getBooks()).map(e -> e.split(",")).orElse(new String[]{});
-        List<Long> course1booksLong = Arrays.stream(course1books).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> course1booksLong = Arrays.stream(course1books).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
 
         String[] course2books = Optional.ofNullable(course.getBooks()).map(e -> e.split(",")).orElse(new String[]{});
-        List<Long> course2booksLong = Arrays.stream(course2books).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> course2booksLong = Arrays.stream(course2books).filter(StringUtils::isNotEmpty).map(Long::valueOf).collect(Collectors.toList());
         for (Long aLong : course2booksLong) {
             if (course1booksLong.contains(aLong)) {
                 continue;
