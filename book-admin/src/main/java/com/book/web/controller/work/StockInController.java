@@ -51,6 +51,8 @@ public class StockInController extends BaseController
     {
         startPage();
         List<StockInVO> list = stockInService.selectStockInList(stockIn);
+        long count = stockInService.count(new QueryWrapper<>(stockIn));
+        dataTable.setTotal(count);
         return getDataTable(list);
     }
 
