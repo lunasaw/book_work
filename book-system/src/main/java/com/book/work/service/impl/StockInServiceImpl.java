@@ -27,6 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.book.work.mapper.StockInMapper;
 import com.book.work.domain.StockIn;
 import com.book.work.service.IStockInService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 书籍领取列Service业务层处理
@@ -143,6 +144,7 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public int updateStockIn(StockIn stockIn) {
         stockIn.setUpdateTime(DateUtils.getNowDate());
         StockIn stockIn1 = stockInMapper.selectStockInById(stockIn.getId());
@@ -158,6 +160,12 @@ public class StockInServiceImpl extends ServiceImpl<StockInMapper, StockIn> impl
                 new BigDecimal(teachClass.getPayCost()).subtract(BigDecimal.valueOf(sum).multiply(BigDecimal.valueOf(teachClass.getClassSize())));
             teachClass.setPayCost(subtract.toString());
             teachClassMapper.updateTeachClass(teachClass);
+
+            // 库存减少
+            for (Book book : books) {
+                book.setStockSum(book.getStockSum() - teachClass.getClassSize());
+                bookMapper.updateBook(book);
+            }
         }
 
         return stockInMapper.updateStockIn(stockIn);
